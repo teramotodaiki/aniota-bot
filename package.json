@@ -20,7 +20,7 @@
     "serve": "npm run build && npx firebase serve --only functions",
     "shell": "npm run build && npx firebase functions:shell",
     "start": "npm run shell",
-    "deploy": "firebase deploy --only functions",
+    "deploy": "firebase deploy",
     "logs": "firebase functions:log",
     "lint": "npx prettier -l \"**/*.{js,ts,json}\"",
     "format": "prettier --write \"**/*.{js,ts,json}\""
