@@ -1,0 +1,38 @@
+{
+  "name": "aniota-bot",
+  "version": "1.0.0",
+  "description": "Anime otaku bot for Slack.",
+  "main": "lib/index.js",
+  "dependencies": {},
+  "devDependencies": {
+    "ava": "^1.0.1",
+    "firebase-tools": "^6.2.2",
+    "prettier": "^1.15.3",
+    "ts-node": "^7.0.1",
+    "typescript": "^3.2.2"
+  },
+  "scripts": {
+    "test": "ava",
+    "lint": "npx prettier -l \"**/*.{js,ts,json}\"",
+    "format": "npx prettier --write \"**/*.{js,ts,json}\""
+  },
+  "ava": {
+    "compileEnhancements": false,
+    "extensions": [
+      "ts"
+    ],
+    "require": [
+      "ts-node/register"
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/teramotodaiki/aniota-bot.git"
+  },
+  "author": "teramotodaiki",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/teramotodaiki/aniota-bot/issues"
+  },
+  "homepage": "https://github.com/teramotodaiki/aniota-bot#readme"
+}
