@@ -1,3 +1,17 @@
 {
-  "indexes": []
+  "indexes": [
+    {
+      "collectionId": "follows",
+      "fields": [
+        {
+          "fieldPath": "query",
+          "mode": "ASCENDING"
+        },
+        {
+          "fieldPath": "user_id",
+          "mode": "ASCENDING"
+        }
+      ]
+    }
+  ]
 }
