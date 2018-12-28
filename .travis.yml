@@ -1,0 +1,13 @@
+language: node_js
+node_js: '8'
+cache: npm
+script:
+  - npm install
+deploy:
+  - provider: firebase
+    skip_cleanup: true
+    project: 'aniota-bot'
+    token:
+      - secure: Bchqy5fnaA06yUTgo2C1OGXx1fOtvvF4OOnVrZGTBOVN5jgRykHckhkhvROGBsTRq+BWT9FYB2RKSmZ1M5Zw33NlxQ4oXOXmAYrwThttnceB5xrsTwhQvXesRpLSLl79fwpLbtu6vYIvxCfd/KRuajxR0Il9UGdgJZiI2YqfQI4v7VqSJvxD0LXIglWyDTuemVPVO0smgtNhIB4TsKPzhT7uzDDK5Q0E2R/swXGGzhKlmfvElyRPwz6Aw8Qgb8ySm2EwbBX0/ryyTbY8QPzVpDqlHV8TKZ6UYKPsm/VPeEirOAfxNfKVrCjgrUq1IBbAAGENDQo1UvA/v1U5nUXiQZiaVeUcb4nEuU4osPIPv4OEuQfYm3LI7jMRNHzcBSTYlbjlGuf1+lAIwsGGeuIjPonQeoHQyFJiFm2tl/bm5TbE64bXlu2Yj8HlhNNDjZCDi4SjlfvKgu+84J4hGHJd9xMdpcSdR4uBtVAJFm8mwyjsO88kkNoQTJC/3dC3v3edgbRZqi0+EikbE+T768w07qnamiDahMcGbQ15U3wuXYdgBz2EQDBBT1/7yKxxLeQumlqr2AD5OLNT/Su5kCAp3nTyKnCYDH9M5BTCIaRJMtms/JYpTRMXgLzZ7X0rKwMoOWl1zTm4p0Ww1q5cdeRq+wl+0cig51mhRL0Y8N6oBDI=
+    on:
+      branch: master
