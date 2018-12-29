@@ -50,6 +50,6 @@ export const follow = functions.https.onRequest(async (request, response) => {
   }
 
   return response.send({
-    text: `You're following ${talentName}. @${body.user_name}`
+    text: `You're following ${talentName}. <@${body.user_id}>`
   })
 })
