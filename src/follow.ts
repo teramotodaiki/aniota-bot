@@ -6,6 +6,7 @@ import firestore, { Timestamp, Talent, Follow } from './firestore'
 export const follow = functions.https.onRequest(async (request, response) => {
   const body = request.body as OutgoingRequestBody
   const [, talentName] = body.text.split(' ', 2)
+  console.log(body)
   // "name" を含むタレントを取得または作成する
   let talentRef: Firestore.DocumentReference
   await firestore.runTransaction(async t => {
@@ -25,6 +26,7 @@ export const follow = functions.https.onRequest(async (request, response) => {
       talentRef = querySnapshot.docs[0].ref
     }
   })
+  console.log(talentRef.id)
   // タレントに紐づいたフォロワーを作成する
   await firestore.runTransaction(async t => {
     const query = talentRef
@@ -44,7 +46,10 @@ export const follow = functions.https.onRequest(async (request, response) => {
         text: body.text,
         trigger_word: body.trigger_word
       }
-      await talentRef.collection('follows').add(follow)
+      const followRef = await talentRef.collection('follows').add(follow)
+      console.log('add follow', followRef.id)
+    } else {
+      console.log('exist follow', querySnapshot.docs[0].id)
     }
   })
 
