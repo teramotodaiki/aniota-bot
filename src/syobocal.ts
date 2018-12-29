@@ -7,7 +7,22 @@ export interface BaseParams {
 }
 export interface TitleLookupParams extends BaseParams {
   TID: string
+  LastUpdate?: string
 }
+
+export enum TitleCategory {
+  'アニメ' = 1,
+  'アニメ(終了/再放送)' = 10,
+  'OVA' = 7,
+  'アニメ関連' = 5,
+  '特撮' = 4,
+  '映画' = 8,
+  'テレビ' = 3,
+  'ラジオ' = 2,
+  'メモ' = 6,
+  'その他' = 0
+}
+
 export interface TitleLookupResult {
   tid: string
   last_update: string
@@ -16,6 +31,7 @@ export interface TitleLookupResult {
   title_yomi: string
   title_en: string
   comment: string
+  cat: TitleCategory
   url?: string
 }
 
@@ -47,30 +63,37 @@ export function getTitleLookupUrl(params: TitleLookupParams) {
   return `${api.db}?Command=TitleLookup&${search.toString()}`
 }
 
-export function parseTitleLookupResponse(xml: string): TitleLookupResult {
+export function parseTitleLookupResponse(xml: string): TitleLookupResult[] {
   const $ = load(xml, { xmlMode: true })
-  const comment = $('Comment')
-    .text()
-    .replace(/\r\n/g, '\n')
-  const result: TitleLookupResult = {
-    tid: $('TID').text(),
-    last_update: $('LastUpdate').text(),
-    title: $('Title').text(),
-    short_title: $('ShortTitle').text(),
-    title_yomi: $('TitleYomi').text(),
-    title_en: $('TitleEN').text(),
-    comment
-  }
-  const foundUrl = urlRegExp.exec(comment)
-  if (foundUrl) {
-    result.url = foundUrl[0]
-  }
-  return result
+  return $('TitleItem')
+    .toArray()
+    .map(item => {
+      const $item = $(item)
+      const comment = $item
+        .find('Comment')
+        .text()
+        .replace(/\r\n/g, '\n')
+      const result: TitleLookupResult = {
+        tid: $item.find('TID').text(),
+        last_update: $item.find('LastUpdate').text(),
+        title: $item.find('Title').text(),
+        short_title: $item.find('ShortTitle').text(),
+        title_yomi: $item.find('TitleYomi').text(),
+        title_en: $item.find('TitleEN').text(),
+        cat: parseInt($item.find('Cat').text(), 10),
+        comment
+      }
+      const foundUrl = urlRegExp.exec(comment)
+      if (foundUrl) {
+        result.url = foundUrl[0]
+      }
+      return result
+    })
 }
 
 export async function titleLookup(
   params: TitleLookupParams
-): Promise<TitleLookupResult> {
+): Promise<TitleLookupResult[]> {
   const response = await fetch(getTitleLookupUrl(params))
   const xml = await response.text()
   return parseTitleLookupResponse(xml)

@@ -11,7 +11,7 @@ test('syobocal TitleLookup API', t => {
 
 test('syobocal TitleLookup Result', async t => {
   const TID = '5049'
-  const result = await syobocal.titleLookup({ TID })
+  const [result] = await syobocal.titleLookup({ TID })
   t.is(result.tid, '5049')
   t.is(typeof result.last_update, 'string')
   t.is(result.last_update, '2018-12-23 00:37:59')
