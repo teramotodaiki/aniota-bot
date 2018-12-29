@@ -56,7 +56,7 @@ const api = {
   db: endpoint + '/db.php',
   calChk: endpoint + '/cal_chk.php'
 }
-const urlRegExp = /https?:\/\/[!#%'()*-./?0-9A-Z_a-z~]+/g
+const urlRegExp = /https?\:\/\/[!#%'()*-./?0-9A-Z_a-z~]+/g
 
 export function getTitleLookupUrl(params: TitleLookupParams) {
   const search = new URLSearchParams(params)
