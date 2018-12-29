@@ -1,4 +1,4 @@
-export interface OutgoingRequestParams {
+export interface OutgoingRequestBody {
   token: string
   team_id: string
   team_domain: string
