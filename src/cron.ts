@@ -5,6 +5,7 @@ import firestore, { SyobocalTitle, Timestamp } from './firestore'
 export const cron = functions.https.onRequest(async (request, response) => {
   // syobocal から番組表を取得 (before がないので, 放送日が今日以降３０日以内の番組を全て取得)
   const result = await syobocal.calChk({ days: '30' })
+  console.log(`fetched ${result.length} programs`)
   const batch = firestore.batch()
   for (const item of result) {
     const ref = firestore.doc(`syobocal_titles/${item.tid}`)
@@ -18,6 +19,7 @@ export const cron = functions.https.onRequest(async (request, response) => {
         updated_at: null
       }
       batch.create(ref, title)
+      console.log('add', result.tid, result.title)
     }
   }
   await batch.commit()
