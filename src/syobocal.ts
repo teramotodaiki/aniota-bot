@@ -52,17 +52,20 @@ export function parseTitleLookupResponse(xml: string): TitleLookupResult {
   const comment = $('Comment')
     .text()
     .replace(/\r\n/g, '\n')
-  const result = urlRegExp.exec(comment)
-  return {
+  const result: TitleLookupResult = {
     tid: $('TID').text(),
     last_update: $('LastUpdate').text(),
     title: $('Title').text(),
     short_title: $('ShortTitle').text(),
     title_yomi: $('TitleYomi').text(),
     title_en: $('TitleEN').text(),
-    comment,
-    url: result ? result[0] : undefined
+    comment
   }
+  const foundUrl = urlRegExp.exec(comment)
+  if (foundUrl) {
+    result.url = foundUrl[0]
+  }
+  return result
 }
 
 export async function titleLookup(
