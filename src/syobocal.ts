@@ -19,9 +19,26 @@ export interface TitleLookupResult {
   url?: string
 }
 
+export interface CalChkParams extends BaseParams {
+  days: string
+}
+
+export interface CalChkResult {
+  pid: string
+  tid: string
+  st_time: string
+  ed_time: string
+  ch_name: string
+  ch_id: string
+  st_offset: string
+  sub_title: string
+  title: string
+}
+
 const endpoint = 'http://cal.syoboi.jp'
 const api = {
-  db: endpoint + '/db.php'
+  db: endpoint + '/db.php',
+  calChk: endpoint + '/cal_chk.php'
 }
 const urlRegExp = /https?:\/\/[!#%'()*-./?0-9A-Z_a-z~]+/g
 
@@ -54,4 +71,34 @@ export async function titleLookup(
   const response = await fetch(getTitleLookupUrl(params))
   const xml = await response.text()
   return parseTitleLookupResponse(xml)
+}
+
+export function getCalChkUrl(params: CalChkParams) {
+  const search = new URLSearchParams(params)
+  return `${api.calChk}?${search.toString()}`
+}
+
+export function parseCalChkResponse(xml: string): CalChkResult[] {
+  const $ = load(xml, { xmlMode: true })
+  return $('ProgItem')
+    .toArray()
+    .map(progItem => {
+      return {
+        pid: progItem.attribs.pid,
+        tid: progItem.attribs.tid,
+        st_time: progItem.attribs.st_time,
+        ed_time: progItem.attribs.ed_time,
+        ch_name: progItem.attribs.ch_name,
+        ch_id: progItem.attribs.ch_id,
+        st_offset: progItem.attribs.st_offset,
+        sub_title: progItem.attribs.sub_title,
+        title: progItem.attribs.title
+      }
+    })
+}
+
+export async function calChk(params: CalChkParams) {
+  const response = await fetch(getCalChkUrl(params))
+  const xml = await response.text()
+  return parseCalChkResponse(xml)
 }

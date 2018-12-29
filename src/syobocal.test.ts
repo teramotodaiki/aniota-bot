@@ -1,9 +1,9 @@
 import test from 'ava'
-import { titleLookup, getTitleLookupUrl } from './syobocal'
+import * as syobocal from './syobocal'
 
 test('syobocal TitleLookup API', t => {
   const TID = '5049'
-  const url = getTitleLookupUrl({
+  const url = syobocal.getTitleLookupUrl({
     TID
   })
   t.is(url, 'http://cal.syoboi.jp/db.php?Command=TitleLookup&TID=' + TID)
@@ -11,7 +11,7 @@ test('syobocal TitleLookup API', t => {
 
 test('syobocal TitleLookup Result', async t => {
   const TID = '5049'
-  const result = await titleLookup({ TID })
+  const result = await syobocal.titleLookup({ TID })
   t.is(result.tid, '5049')
   t.is(typeof result.last_update, 'string')
   t.is(result.last_update, '2018-12-23 00:37:59')
@@ -24,6 +24,13 @@ test('syobocal TitleLookup Result', async t => {
     t.is(result.comment, sampleComment())
     t.is(result.url, 'https://sao-alicization.net/') // 変わるかもしれない
   }
+})
+
+test('syobocal CalChk API', t => {
+  const url = syobocal.getCalChkUrl({
+    days: '1'
+  })
+  t.is(url, 'http://cal.syoboi.jp/cal_chk.php?days=1')
 })
 
 function sampleComment() {
