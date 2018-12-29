@@ -11,8 +11,13 @@ export default db
 
 export const Timestamp = firestore.Timestamp
 
+export interface Talent extends firestore.DocumentData {
+  name: string
+  created_at: firestore.Timestamp
+  updated_at: firestore.Timestamp | null
+}
+
 export interface Follow extends firestore.DocumentData {
-  query: string
   created_at: firestore.Timestamp
   updated_at: firestore.Timestamp | null
   channel_id: string
