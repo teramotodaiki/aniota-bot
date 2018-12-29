@@ -17,7 +17,7 @@ export interface Talent extends firestore.DocumentData {
   updated_at: firestore.Timestamp | null
 }
 
-export interface Follow extends firestore.DocumentData {
+export interface Follower extends firestore.DocumentData {
   created_at: firestore.Timestamp
   updated_at: firestore.Timestamp | null
   channel_id: string
