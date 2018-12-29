@@ -21,4 +21,5 @@ export const cron = functions.https.onRequest(async (request, response) => {
     }
   }
   await batch.commit()
+  return response.status(200)
 })
