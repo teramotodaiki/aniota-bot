@@ -3,6 +3,7 @@ import * as syobocal from './syobocal'
 import firestore, { SyobocalTitle, Timestamp } from './firestore'
 
 export const cron = functions.https.onRequest(async (request, response) => {
+  console.log('start')
   // syobocal から番組表を取得 (before がないので, 放送日が今日以降３０日以内の番組を全て取得)
   const result = await syobocal.calChk({ days: '30' })
   console.log(`fetched ${result.length} programs`)
