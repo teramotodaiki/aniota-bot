@@ -19,7 +19,7 @@ export const cron = functions.https.onRequest(async (request, response) => {
     LastUpdate: since.format('YYYYMMDD_000000-')
   })
   console.log(`fetched ${result.length} titles`)
-  let maxBatchSize = 10
+  let maxBatchSize = 50
   const batch = firestore.batch()
   for (const item of result) {
     const ref = firestore.doc(`syobocal_titles/${item.tid}`)
@@ -36,5 +36,5 @@ export const cron = functions.https.onRequest(async (request, response) => {
     if (--maxBatchSize < 0) break // もう一旦書きこむ. でないとタイムアウトになる
   }
   await batch.commit()
-  return response.status(200)
+  return response.send(200)
 })
