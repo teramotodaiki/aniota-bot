@@ -1,5 +1,7 @@
 import test from 'ava'
 import * as syobocal from './syobocal'
+import { pick, toPairs, mapValues } from 'lodash'
+import { Talent } from './talent'
 
 test('syobocal TitleLookup API', t => {
   const TID = '5049'
@@ -34,9 +36,14 @@ test('syobocal CalChk API', t => {
 })
 
 test('extract credits', t => {
-  const talentNames = ['川原礫', '鈴木豪', '藍井エイル', '戸松遥']
+  const talents = sampleTalents()
+  for (const [id, talent] of toPairs(talents)) {
+    t.is(typeof id, 'string')
+    t.is(typeof talent.name, 'string')
+  }
+  // roles の部分を抽出する
   t.deepEqual(
-    syobocal.parseCreditsFromComment(sampleComment(), talentNames),
+    syobocal.parseCreditsFromComment(sampleComment(), talents),
     sampleCredits()
   )
 })
@@ -133,9 +140,13 @@ function sampleComment() {
 :安岐ナツキ:川澄綾子`.trimLeft()
 }
 
-function sampleCredits(): syobocal.Credit[] {
-  return [
-    {
+function sampleTalents(): { [id: string]: Talent } {
+  return mapValues(sampleCredits(), credit => pick(credit, ['name']))
+}
+
+function sampleCredits(): { [id: string]: syobocal.Credit } {
+  return {
+    '0': {
       name: '川原礫',
       roles: [
         {
@@ -144,7 +155,7 @@ function sampleCredits(): syobocal.Credit[] {
         }
       ]
     },
-    {
+    '1': {
       name: '鈴木豪',
       roles: [
         {
@@ -157,7 +168,7 @@ function sampleCredits(): syobocal.Credit[] {
         }
       ]
     },
-    {
+    '2': {
       name: '藍井エイル',
       roles: [
         {
@@ -166,7 +177,7 @@ function sampleCredits(): syobocal.Credit[] {
         }
       ]
     },
-    {
+    '3': {
       name: '戸松遥',
       roles: [
         {
@@ -175,5 +186,5 @@ function sampleCredits(): syobocal.Credit[] {
         }
       ]
     }
-  ]
+  }
 }

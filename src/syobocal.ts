@@ -1,7 +1,8 @@
 import fetch from 'node-fetch'
 import { URLSearchParams } from 'url'
 import { load } from 'cheerio'
-import { includes } from 'lodash'
+import { includes, toPairs } from 'lodash'
+import { Talent } from './talent'
 
 export interface BaseParams {
   [key: string]: string | string[]
@@ -152,9 +153,9 @@ type CommentLineObject =
 
 export function parseCreditsFromComment(
   comment: string,
-  talentNames: string[]
-): Credit[] {
-  const credits: Credit[] = []
+  talents: { [id: string]: Talent }
+): { [key: string]: Credit } {
+  const credits: { [key: string]: Credit } = {}
   const commentLines: CommentLineObject[] = []
   // パース
   for (const lineText of comment.split('\n')) {
@@ -170,16 +171,16 @@ export function parseCreditsFromComment(
   }
   // talent ごとに走査
   let group = ''
-  for (const name of talentNames) {
-    const credit: Credit = { name, roles: [] }
+  for (const [talent_id, talent] of toPairs(talents)) {
+    const credit: Credit = { name: talent.name, roles: [] }
     for (const line of commentLines) {
       if (line.type === '*') {
         group = line.group
-      } else if (includes(line.people, name)) {
+      } else if (includes(line.people, talent.name)) {
         credit.roles.push({ role: line.role, group })
       }
     }
-    credits.push(credit)
+    credits[talent_id] = credit
   }
   return credits
 }
