@@ -12,14 +12,14 @@ const categoryFilter = [
 
 export const cron = functions.https.onRequest(async (request, response) => {
   console.log('start')
-  // syobocal からタイトル一覧を取得 (最終更新日時が７日以内のタイトルを一括取得）
-  const since = moment().subtract(7, 'days')
+  // syobocal からタイトル一覧を取得 (最終更新日時が３日以内のタイトルを一括取得）
+  const since = moment().subtract(3, 'days')
   const result = await syobocal.titleLookup({
     TID: '*',
     LastUpdate: since.format('YYYYMMDD_000000-')
   })
   console.log(`fetched ${result.length} titles`)
-  result.splice(500) // バッチ処理可能な限界 ref. https://firebase.google.com/docs/firestore/manage-data/transactions?authuser=0#batched-writes
+  let maxBatchSize = 10
   const batch = firestore.batch()
   for (const item of result) {
     const ref = firestore.doc(`syobocal_titles/${item.tid}`)
@@ -33,6 +33,7 @@ export const cron = functions.https.onRequest(async (request, response) => {
       updated_at: null
     }
     batch.create(ref, title)
+    if (--maxBatchSize < 0) break // もう一旦書きこむ. でないとタイムアウトになる
   }
   await batch.commit()
   return response.status(200)
