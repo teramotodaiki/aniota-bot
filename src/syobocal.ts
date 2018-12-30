@@ -180,7 +180,9 @@ export function parseCreditsFromComment(
         credit.roles.push({ role: line.role, group })
       }
     }
-    credits[talent_id] = credit
+    if (credit.roles.length > 0) {
+      credits[talent_id] = credit // １つでもロールがあれば追加
+    }
   }
   return credits
 }
