@@ -43,7 +43,7 @@ export const follow = functions.https.onRequest(async (request, response) => {
       text: body.text,
       trigger_word: body.trigger_word
     }
-    const followerRef = await talentRef.collection('follows').add(follower)
+    const followerRef = await talentRef.collection('followers').add(follower)
     console.log('add follower', followerRef.id)
   } else {
     console.log('following', followerResult.docs[0].id)

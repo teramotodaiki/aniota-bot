@@ -1,7 +1,7 @@
 {
   "indexes": [
     {
-      "collectionId": "follows",
+      "collectionId": "followers",
       "fields": [
         {
           "fieldPath": "query",
