@@ -33,12 +33,10 @@ export interface Follower extends firestore.DocumentData {
 export interface SyobocalTitle
   extends firestore.DocumentData,
     syobocal.TitleLookupResult {
-  created_at: firestore.Timestamp
-  updated_at: firestore.Timestamp | null
+  isFollowedSomeone: boolean
+  isNotified: boolean
 }
 
 export interface Credit extends firestore.DocumentData, syobocal.Credit {
   talent_id: string
-  created_at: firestore.Timestamp
-  updated_at: firestore.Timestamp | null
 }
