@@ -12,6 +12,19 @@
           "mode": "ASCENDING"
         }
       ]
+    },
+    {
+      "collectionId": "syobocal_titles",
+      "fields": [
+        {
+          "fieldPath": "is_followed_by_someone",
+          "mode": "ASCENDING"
+        },
+        {
+          "fieldPath": "is_notified",
+          "mode": "ASCENDING"
+        }
+      ]
     }
   ]
 }

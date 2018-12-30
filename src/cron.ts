@@ -46,8 +46,8 @@ export const cron = functions.https.onRequest(async (request, response) => {
 
     const title: SyobocalTitle = {
       ...item,
-      isFollowedSomeone: keys(credits).length > 0,
-      isNotified: false
+      is_followed_by_someone: keys(credits).length > 0,
+      is_notified: false
     }
     batch.set(titleRef, title, {
       mergeFields: keys(item)

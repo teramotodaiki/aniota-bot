@@ -33,8 +33,8 @@ export interface Follower extends firestore.DocumentData {
 export interface SyobocalTitle
   extends firestore.DocumentData,
     syobocal.TitleLookupResult {
-  isFollowedSomeone: boolean
-  isNotified: boolean
+  is_followed_by_someone: boolean
+  is_notified: boolean
 }
 
 export interface Credit extends firestore.DocumentData, syobocal.Credit {
