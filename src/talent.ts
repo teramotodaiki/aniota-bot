@@ -14,10 +14,12 @@ export const initializeTalents = firestore
     for (const doc of snapshot.docs) {
       talents[doc.id] = doc.data() as Talent
     }
+    console.log(`loaded ${snapshot.size} docs`)
   }) // 初期ロードが終わるまでは待ちたいときに使う
 
 export const talentCreated = functions.firestore
   .document('talents/{talent_id}')
   .onCreate(async (snapshot, context) => {
     talents[snapshot.id] = snapshot.data() as Talent // メモリに載せる
+    console.log('add talent', snapshot.id, talents[snapshot.id])
   })
