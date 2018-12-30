@@ -1,6 +1,7 @@
 import fetch from 'node-fetch'
 import { URLSearchParams } from 'url'
 import { load } from 'cheerio'
+import { includes } from 'lodash'
 
 export interface BaseParams {
   [key: string]: string | string[]
@@ -49,6 +50,14 @@ export interface CalChkResult {
   st_offset: string
   sub_title: string
   title: string
+}
+
+export interface Credit {
+  name: string
+  roles: {
+    role: string // role
+    group: string
+  }[]
 }
 
 const endpoint = 'http://cal.syoboi.jp'
@@ -127,4 +136,50 @@ export async function calChk(params: CalChkParams) {
   const response = await fetch(getCalChkUrl(params))
   const xml = await response.text()
   return parseCalChkResponse(xml)
+}
+
+type CommentLineObject =
+  | {
+      type: '*'
+      group: string
+    }
+  | {
+      type: ':'
+      role: string
+      people: string
+    }
+  | null
+
+export function parseCreditsFromComment(
+  comment: string,
+  talentNames: string[]
+): Credit[] {
+  const credits: Credit[] = []
+  const commentLines: CommentLineObject[] = []
+  // パース
+  for (const lineText of comment.split('\n')) {
+    switch (lineText.substr(0, 1)) {
+      case '*':
+        // e.g. "*スタッフ"
+        commentLines.push({ type: '*', group: lineText.substr(1) })
+      case ':':
+        // e.g. ":原作:川原礫(電撃文庫)"
+        const [, role, people] = lineText.split(':')
+        commentLines.push({ type: ':', role, people })
+    }
+  }
+  // talent ごとに走査
+  let group = ''
+  for (const name of talentNames) {
+    const credit: Credit = { name, roles: [] }
+    for (const line of commentLines) {
+      if (line.type === '*') {
+        group = line.group
+      } else if (includes(line.people, name)) {
+        credit.roles.push({ role: line.role, group })
+      }
+    }
+    credits.push(credit)
+  }
+  return credits
 }

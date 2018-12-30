@@ -33,6 +33,14 @@ test('syobocal CalChk API', t => {
   t.is(url, 'http://cal.syoboi.jp/cal_chk.php?days=1')
 })
 
+test('extract credits', t => {
+  const talentNames = ['川原礫', '鈴木豪', '藍井エイル', '戸松遥']
+  t.deepEqual(
+    syobocal.parseCreditsFromComment(sampleComment(), talentNames),
+    sampleCredits()
+  )
+})
+
 function sampleComment() {
   return `
 *リンク
@@ -123,4 +131,49 @@ function sampleComment() {
 :比嘉タケル:野島健児
 :桐ヶ谷翠:遠藤綾
 :安岐ナツキ:川澄綾子`.trimLeft()
+}
+
+function sampleCredits(): syobocal.Credit[] {
+  return [
+    {
+      name: '川原礫',
+      roles: [
+        {
+          role: '原作',
+          group: 'スタッフ'
+        }
+      ]
+    },
+    {
+      name: '鈴木豪',
+      roles: [
+        {
+          role: 'キャラクターデザイン',
+          group: 'スタッフ'
+        },
+        {
+          role: '総作画監督',
+          group: 'スタッフ'
+        }
+      ]
+    },
+    {
+      name: '藍井エイル',
+      roles: [
+        {
+          role: '歌',
+          group: 'エンディングテーマ1「アイリス」'
+        }
+      ]
+    },
+    {
+      name: '戸松遥',
+      roles: [
+        {
+          role: 'アスナ(結城明日奈)',
+          group: 'キャスト'
+        }
+      ]
+    }
+  ]
 }

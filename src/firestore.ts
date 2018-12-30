@@ -1,5 +1,5 @@
 import { initializeApp, firestore } from 'firebase-admin'
-import { TitleLookupResult } from './syobocal'
+import * as syobocal from './syobocal'
 
 // Initialize the default app
 // Cloud Functions 上で実行されるときは $FIREBASE_CONFIG にデフォルトの認証情報が入っている
@@ -32,7 +32,11 @@ export interface Follower extends firestore.DocumentData {
 
 export interface SyobocalTitle
   extends firestore.DocumentData,
-    TitleLookupResult {
+    syobocal.TitleLookupResult {
   created_at: firestore.Timestamp
   updated_at: firestore.Timestamp | null
+}
+
+export interface Credit extends firestore.DocumentData, syobocal.Credit {
+  talent_id?: string
 }
