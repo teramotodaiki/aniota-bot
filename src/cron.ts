@@ -2,7 +2,7 @@ import * as functions from 'firebase-functions'
 import * as syobocal from './syobocal'
 import firestore, { SyobocalTitle, Credit } from './firestore'
 import * as moment from 'moment'
-import { includes, toPairs, keys } from 'lodash'
+import { includes, toPairs, keys, omit } from 'lodash'
 import * as talent from './talent'
 
 const categoryFilter = [
@@ -22,36 +22,53 @@ export const cron = functions.https.onRequest(async (request, response) => {
   console.log(`fetched ${result.length} titles`)
   result.splice(100) // バッチ処理できる最大数が 500 程度なので, 一度にセットするドキュメント数を絞る
 
-  await talent.initializeTalents // タレントの初期ロードが終わるのを待つ
-
-  const batch = firestore.batch()
+  // 必要になるデータを事前に取得して, 追加すべきデータの配列にしておく
+  const newTitles: {
+    tid: string
+    result: syobocal.TitleLookupResult
+    ref: FirebaseFirestore.DocumentReference
+    credits: { [key: string]: syobocal.Credit }
+    is_notified: boolean
+  }[] = []
   for (const item of result) {
     if (!includes(categoryFilter, item.cat)) continue // カテゴリで弾く
-    const titleRef = firestore.collection('syobocal_titles').doc(item.tid)
-
-    // フォロー中のタレントが含まれるクレジットを抽出
-    const credits = syobocal.parseCreditsFromComment(
+    const ref = firestore.collection('syobocal_titles').doc(item.tid)
+    const titleSnapshot = await ref.get()
+    const currentCreditList = await ref.collection('credits').listDocuments()
+    const currentCreditIds = currentCreditList.map(ref => ref.id)
+    const allCredits = syobocal.parseCreditsFromComment(
       item.comment,
       talent.talents
-    )
-    // バッチで追加
+    ) // フォロー中のタレントが含まれるクレジットを抽出
+    const credits = omit(allCredits, currentCreditIds) // 既にあるものを除く
+    const is_notified = Boolean(titleSnapshot.get('is_notified')) // 初期値は false
+    newTitles[item.tid] = {
+      ref,
+      credits,
+      is_notified
+    }
+  }
+  console.log(`prepare ${newTitles.length} titles`)
+
+  await talent.initializeTalents // タレントの初期ロードが終わるのを待つ
+
+  // バッチで追加
+  const batch = firestore.batch()
+  for (const { ref, result, credits, is_notified } of newTitles) {
     for (const [talent_id, credit] of toPairs(credits)) {
-      const creditRef = titleRef.collection('credits').doc(talent_id) // タレント一意になるように id を同じにする
+      const creditRef = ref.collection('credits').doc(talent_id) // タレント一意になるように id を同じにする
       const creditDoc: Credit = {
         ...credit,
         talent_id
       }
       batch.set(creditRef, creditDoc)
     }
-
     const title: SyobocalTitle = {
-      ...item,
+      ...result,
       is_followed_by_someone: keys(credits).length > 0,
-      is_notified: false
+      is_notified
     }
-    batch.set(titleRef, title, {
-      mergeFields: keys(item)
-    }) // 取得したデータは merge するが, 状態は merge せずに今のままを保つ
+    batch.set(ref, title)
   }
   await batch.commit()
   return response.send(200)

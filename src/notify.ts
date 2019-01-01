@@ -44,6 +44,9 @@ export const notify = functions.https.onRequest(async (request, response) => {
         text
       })
     })
+    await titleSnapshot.ref.update({
+      is_notified: true
+    })
   }
   return response.send(200)
 })
