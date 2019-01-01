@@ -24,7 +24,6 @@ export const cron = functions.https.onRequest(async (request, response) => {
 
   // 必要になるデータを事前に取得して, 追加すべきデータの配列にしておく
   const newTitles: {
-    tid: string
     result: syobocal.TitleLookupResult
     ref: FirebaseFirestore.DocumentReference
     credits: { [key: string]: syobocal.Credit }
@@ -42,11 +41,12 @@ export const cron = functions.https.onRequest(async (request, response) => {
     ) // フォロー中のタレントが含まれるクレジットを抽出
     const credits = omit(allCredits, currentCreditIds) // 既にあるものを除く
     const is_notified = Boolean(titleSnapshot.get('is_notified')) // 初期値は false
-    newTitles[item.tid] = {
+    newTitles.push({
+      result: item,
       ref,
       credits,
       is_notified
-    }
+    })
   }
   console.log(`prepare ${newTitles.length} titles`)
 
