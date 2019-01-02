@@ -41,7 +41,8 @@ export const notify = functions.https.onRequest(async (request, response) => {
     await fetch(slack.url, {
       method: 'POST',
       body: JSON.stringify({
-        text
+        text,
+        unfurl_links: true
       })
     })
     await titleSnapshot.ref.update({
