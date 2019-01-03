@@ -27,7 +27,6 @@ export interface Follower extends firestore.DocumentData {
   user_id: string
   user_name: string
   text: string
-  trigger_word: string
 }
 
 export interface SyobocalTitle
