@@ -18,12 +18,13 @@ export const notify = functions.https.onRequest(async (request, response) => {
 
   for (const titleSnapshot of notNotifiedYet.docs) {
     // そのタイトルのクレジットに載っている人たちの id (talent_id) を全て取得する
-    const creditList = await titleSnapshot.ref
-      .collection('credits')
-      .listDocuments()
+    const creditSnapshot = await titleSnapshot.ref.collection('credits').get()
+    const creditList = creditSnapshot.docs
     const talentIds = creditList.map(ref => ref.id)
-    // そのタレントをフォローしているユーザーの user_id (Slack) を全て取得する
-    const slackUserIds: string[] = []
+    const talentList = creditList.map(
+      ref => ref.get('role') + '：' + ref.get('name')
+    )
+    const slackUserIds: string[] = [] // そのタレントをフォローしているユーザーの user_id (Slack)
     for (const talent_id of talentIds) {
       const followersSnapshot = await firestore
         .collection('talents')
@@ -34,10 +35,13 @@ export const notify = functions.https.onRequest(async (request, response) => {
         slackUserIds.push(follower.get('user_id'))
       }
     }
-    const mention = uniq(slackUserIds)
-      .map(id => `<@${id}>`)
-      .join(' ')
-    const text = titleSnapshot.get('url') + ' ' + mention
+    const text = [
+      titleSnapshot.get('url'), // https://...
+      talentList.join('\n'), // 担当：名前...
+      uniq(slackUserIds)
+        .map(id => `<@${id}>`)
+        .join(' ') // @UserA @Userb ...
+    ]
     await fetch(slack.url, {
       method: 'POST',
       body: JSON.stringify({
