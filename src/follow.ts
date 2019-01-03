@@ -5,8 +5,13 @@ import firestore, { Timestamp, Talent, Follower } from './firestore'
 
 export const follow = functions.https.onRequest(async (request, response) => {
   const body = request.body as OutgoingRequestBody
-  const [, talentName] = body.text.split(' ', 2)
   console.log(body)
+  const talentName =
+    body.text.indexOf('follow ') === 0
+      ? body.text.split(' ', 2)[1] // Outgoing Webhook "follow X"
+      : body.text // Command /follow
+  console.log(talentName)
+
   // "name" を含むタレントを取得または作成する
   let talentRef: Firestore.DocumentReference
   const talentResult = await firestore
